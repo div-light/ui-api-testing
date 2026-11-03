@@ -10,3 +10,5 @@ auth.json
 
 # Virtual environments
 .venv
+.DS_Store
+artifacts/

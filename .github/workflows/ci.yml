@@ -1,0 +1,8 @@
+name: Hybrid Testing
+
+jobs:
+    test:
+        runs-on: ubuntu/latest
+        steps:
+            - name: Hello World
+              run: echo "Hello World"
