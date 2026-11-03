@@ -1,16 +1,49 @@
 name: Hybrid Testing
 
-on: 
-    push:
-        branches:
-            - main
-    pull_request:
-        branches:
-            - main
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-    test:
-        runs-on: ubuntu/latest
-        steps:
-            - name: Hello World
-              run: echo "Hello World"
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      HEADLESS: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Install Playwright browsers
+        run: uv run playwright install --with-deps chromium
+
+      - name: Run tests
+        run: uv run pytest -n auto --html=report.html --self-contained-html
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-report
+          path: report.html
+          if-no-files-found: ignore
+
+      - name: Upload screenshots, videos and traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts
+          path: artifacts/
+          if-no-files-found: ignore
